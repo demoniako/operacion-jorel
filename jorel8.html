@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <title>Jorel — Mensaje 2</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; min-height: 100%; margin: 0; }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: #000;
+      color: #39ff14;
+      display: grid;
+      place-items: center;
+      padding: 5vw;
+      overflow: hidden;
+      font-family: Impact, "Arial Black", "Segoe UI", sans-serif;
+    }
+    main { width: 100%; text-align: center; }
+    h1 {
+      margin: 0;
+      font-size: clamp(2.35rem, 6.7vw, 7.5rem);
+      font-weight: 900;
+      line-height: 1.12;
+      letter-spacing: .025em;
+      text-transform: uppercase;
+      text-wrap: balance;
+      overflow-wrap: anywhere;
+      text-shadow: 0 0 20px rgba(57,255,20,.42), 0 0 55px rgba(57,255,20,.14);
+      animation: aparecer .65s ease-out both;
+    }
+    .barra {
+      position: fixed;
+      left: 0; bottom: 0;
+      height: 4px;
+      width: 100%;
+      transform: scaleX(0);
+      transform-origin: left center;
+      background: #39ff14;
+      box-shadow: 0 0 16px rgba(57,255,20,.65);
+      animation: progreso 5s linear forwards;
+    }
+    @keyframes aparecer { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: scale(1); } }
+    @keyframes progreso { to { transform: scaleX(1); } }
+    @media (prefers-reduced-motion: reduce) { h1 { animation: none; } }
+  </style>
+</head>
+<body>
+  <main><h1>ESPERAMOS QUE TE GUSTE...</h1></main>
+  <div class="barra" aria-hidden="true"></div>
+  <script>
+    // 5000 milisegundos = 5 segundos. Puedes cambiarlo por 1000 para pruebas.
+    const TIEMPO_MS = 5000;
+    // Debe estar en la misma carpeta que esta página.
+    const siguientePagina = "jorel9.html";
+    window.setTimeout(() => { window.location.replace(siguientePagina); }, TIEMPO_MS);
+  </script>
+  <noscript>
+    <p style="position:fixed;bottom:1rem;text-align:center;font-size:1rem;color:#39ff14;">
+      Activa JavaScript para continuar o <a style="color:#39ff14" href="jorel9.html">pulsa aquí</a>.
+    </p>
+  </noscript>
+</body>
+</html>

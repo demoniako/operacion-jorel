@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050506">
+  <meta name="description" content="Secuencia de acceso a Operación Jorel — Programado by Demoniako">
+  <title>Operación Jorel · Inicializando sistema</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050506;
+      --red: #fb193c;
+      --red-soft: #ff6679;
+      --red-shadow: rgba(251,25,60,.28);
+      --white: #f5f3f4;
+      --muted: #8e858b;
+      --stroke: rgba(255,255,255,.13);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
+      color: var(--white);
+      background: var(--bg);
+      font-family: Consolas, "SFMono-Regular", Menlo, Monaco, "Liberation Mono", monospace;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(to right, transparent 0, rgba(255,255,255,.023) 1px, transparent 1px) 0 0 / 72px 72px,
+        linear-gradient(to bottom, transparent 0, rgba(255,255,255,.023) 1px, transparent 1px) 0 0 / 72px 72px,
+        radial-gradient(ellipse at 50% 42%, rgba(138,5,30,.15), transparent 60%);
+      opacity: .95;
+    }
+    .scanline {
+      position: fixed;
+      z-index: 0;
+      inset: -200% 0 auto;
+      height: 200%;
+      background: linear-gradient(transparent 0%, transparent 48%, rgba(251,25,60,.07) 49.8%, rgba(251,25,60,.12) 50%, transparent 50.4%, transparent 100%);
+      animation: scan 9s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes scan { to { transform: translateY(150%); } }
+    .layout {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1340px);
+      height: 100vh;
+      height: 100dvh;
+      min-height: 360px;
+      margin: 0 auto;
+      padding: clamp(18px, 3.6vw, 52px);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 16px;
+    }
+    .topline, .bottomline { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .identity { display: flex; align-items: center; gap: 13px; min-width: 0; }
+    .symbol {
+      height: 37px; width: 37px;
+      display: grid; place-items: center;
+      border: 1px solid var(--red);
+      transform: rotate(45deg);
+      box-shadow: inset 0 0 19px rgba(251,25,60,.16), 0 0 20px rgba(251,25,60,.11);
+      flex: 0 0 auto;
+    }
+    .symbol span { font-weight: 900; font-size: 19px; color: var(--red); transform: rotate(-45deg); }
+    .smalltop { font-size: 12px; font-weight: 700; letter-spacing: .23em; }
+    .sublabel { margin-top: 5px; font-size: 9px; letter-spacing: .13em; color: var(--muted); }
+    .statuspill {
+      color: #d9cbd0;
+      font-size: 10px;
+      white-space: nowrap;
+      letter-spacing: .1em;
+      border: 1px solid var(--stroke);
+      padding: 10px 13px;
+      background: rgba(10,10,12,.9);
+    }
+    .led {
+      display: inline-block;
+      height: 7px; width: 7px; border-radius: 50%;
+      margin-right: 8px; background: var(--red);
+      box-shadow: 0 0 10px var(--red);
+      animation: blink 1.6s ease-in-out infinite;
+    }
+    @keyframes blink { 50% {opacity:.34} }
+    .center {
+      align-self: center;
+      width: min(100%, 900px);
+      margin: 0 auto;
+      padding: 0 2px;
+    }
+    .eyebrow {
+      display: flex; align-items: center; gap: 14px;
+      font-size: clamp(9px, 1.3vw, 12px);
+      color: var(--red-soft);
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      margin: 0 0 clamp(18px, 3.4vh, 32px);
+    }
+    .eyebrow::before { content: ""; width: 24px; height: 2px; background: var(--red); box-shadow: 0 0 14px var(--red); }
+    h1 { margin: 0; line-height: .96; text-transform: uppercase; }
+    h1 .intro {
+      display: block;
+      color: #f2e9ec;
+      font-family: Impact, "Arial Black", sans-serif;
+      font-size: clamp(29px, 5.1vw, 64px);
+      font-weight: 900;
+      letter-spacing: .1em;
+      margin-bottom: 10px;
+    }
+    h1 .author {
+      display: block;
+      font-family: Impact, "Arial Black", sans-serif;
+      font-weight: 900;
+      font-size: clamp(60px, 10.8vw, 132px);
+      letter-spacing: .015em;
+      color: var(--red);
+      text-shadow: 0 0 26px rgba(251,25,60,.25), 0 0 105px rgba(251,25,60,.14);
+      transform-origin: 0 50%;
+      animation: headingIntro 850ms cubic-bezier(.2,.7,.2,1) both;
+    }
+    @keyframes headingIntro {from {opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .divider {
+      height: 1px;
+      width: 100%;
+      background: linear-gradient(90deg, var(--red), rgba(255,255,255,.16) 68%, transparent);
+      margin: clamp(22px, 5vh, 44px) 0 clamp(18px, 4vh, 32px);
+    }
+    .readout { display:flex; justify-content:space-between; align-items:end; gap:16px; margin-bottom:14px; }
+    .subheading { font-size:clamp(12px,1.5vw,16px); font-weight:700; letter-spacing:.19em; }
+    #stepText { margin-top: 9px; color:var(--muted); font-size:clamp(10px,1.2vw,12px); letter-spacing:.07em; }
+    .percentWrap { display:flex; align-items:baseline; gap:3px; flex:0 0 auto; }
+    #percentage {
+      font-family: Impact, "Arial Black", sans-serif;
+      font-size: clamp(44px, 7vw, 86px);
+      font-variant-numeric: tabular-nums;
+      line-height: .83;
+    }
+    .pct { font-weight:900; color:var(--red); font-size:clamp(19px,2.7vw,31px); }
+    .track {
+      height: 16px;
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.20);
+      background: #171014;
+      box-shadow: 0 0 0 5px rgba(250,250,250,.015);
+    }
+    .track:before { content:""; position:absolute; inset:0; z-index:3; pointer-events:none; background:repeating-linear-gradient(90deg, transparent 0, transparent calc(10% - 2px), rgba(0,0,0,.7) calc(10% - 2px), rgba(0,0,0,.7) 10%); }
+    #progressFill {
+      height:100%; width:0%;
+      background: linear-gradient(90deg, #971027, #f11639 58%, #ff5567);
+      box-shadow: inset 0 1px rgba(255,255,255,.32), 0 0 20px rgba(255,40,80,.65);
+      position:relative;
+      will-change:width;
+    }
+    #progressFill:after {content:"";position:absolute;right:0;top:0;height:100%;width:42px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.47));}
+    .underTrack {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:11px;color:var(--muted);font-size:10px;letter-spacing:.13em;}
+    .underTrack b { color: var(--red-soft); font-weight:500; }
+    .bottomline {padding-top:20px;border-top:1px solid var(--stroke);font-size:10px;color:var(--muted);letter-spacing:.11em;}
+    .bottomline strong {color:var(--white);font-weight:500;}
+    .bottomline .right { text-align:right; }
+    .sideAccent {position:fixed;pointer-events:none;top:50%;width:3px;height:90px;background:linear-gradient(transparent,var(--red),transparent);opacity:.55;}
+    .sideAccent.left{left:0;}.sideAccent.right{right:0;}
+    .exit {animation:fadeOut .35s ease forwards;}
+    @keyframes fadeOut { to {opacity:0;transform:scale(1.007)} }
+    @media(max-height:660px) {
+      .center{max-width:730px}
+      h1 .author{font-size:clamp(58px,10.5vw,115px)}
+      .divider{margin:18px 0}
+      .layout{padding-top:18px;padding-bottom:16px}
+    }
+    @media(max-width:640px) {
+      .layout{padding:20px 19px}
+      .smalltop{font-size:10px}.sublabel{font-size:8px}
+      .statuspill{font-size:8px;padding:8px}
+      h1 .intro{font-size:clamp(28px,7vw,44px)}
+      h1 .author{font-size:clamp(54px,15vw,96px);letter-spacing:0}
+      .bottomline{font-size:8px;line-height:1.6}
+      .bottomline .right{max-width:44%}
+      .underTrack{font-size:9px}
+      .eyebrow{letter-spacing:.10em}
+    }
+    @media(prefers-reduced-motion:reduce) {
+      *,*:before,*:after {animation:none!important;transition:none!important;}
+      .scanline{display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="scanline" aria-hidden="true"></div>
+  <div class="sideAccent left" aria-hidden="true"></div>
+  <div class="sideAccent right" aria-hidden="true"></div>
+  <div class="layout" id="screen">
+    <header class="topline">
+      <div class="identity">
+        <div class="symbol" aria-hidden="true"><span>D</span></div>
+        <div><div class="smalltop">DEMONIAKO // SYSTEMS</div><div class="sublabel">PROTOCOLO DE INICIO · JOREL</div></div>
+      </div>
+      <div class="statuspill"><span class="led"></span><span id="headerStatus">SISTEMA INICIANDO</span></div>
+    </header>
+    <main class="center">
+      <div class="eyebrow">EDICIÓN ESPECIAL · OPERACIÓN JOREL</div>
+      <h1><span class="intro">PROGRAMADO BY</span><span class="author">DEMONIAKO</span></h1>
+      <div class="divider" aria-hidden="true"></div>
+      <div class="readout">
+        <div>
+          <div class="subheading">INICIALIZANDO MISIÓN_</div>
+          <div id="stepText" aria-live="polite">Cargando módulos de combate...</div>
+        </div>
+        <div class="percentWrap"><span id="percentage">00</span><span class="pct">%</span></div>
+      </div>
+      <div id="progressBar" class="track" role="progressbar" aria-label="Progreso de la presentación" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progressFill"></div></div>
+      <div class="underTrack"><span id="log">&gt; BOOT_SEQUENCE: ACTIVE</span><span>ACCESO EN <b id="countdown">15.0 S</b></span></div>
+    </main>
+    <footer class="bottomline"><span>© DEMONIAKO · BUILD </span><span class="right"><strong>DESARROLLADO PARA JOREL</strong> // CLASSIFIED</span></footer>
+  </div>
+  <script>
+    // === CONFIGURACIÓN: cambia estos dos valores si lo necesitas ===
+    const DURACION_MS = 15000;                 // 15000 = 15 segundos
+    const DESTINO = "jorel_asalto_regalo.html"; // Juego en la misma carpeta
+    // ================================================================
+    const start = performance.now();
+    const $ = id => document.getElementById(id);
+    const phases = [
+      { at: 0, text: "Cargando módulos de combate...", log: "> BOOT_SEQUENCE: ACTIVE" },
+      { at: 20, text: "Sincronizando objetivos de misión...", log: "> MISSION_DATA: VERIFIED" },
+      { at: 42, text: "Preparando armamento y enemigos...", log: "> COMBAT_ENGINE: READY" },
+      { at: 64, text: "Estableciendo protocolo de acceso...", log: "> ACCESS_PROTOCOL: ENABLED" },
+      { at: 84, text: "Ultimando operación Jorel...", log: "> FINAL_CHECK: PASSED" },
+      { at: 97, text: "Acceso autorizado. ¡Buena suerte, Jorel!", log: "> ACCESS_GRANTED: TRUE" }
+    ];
+    let currentPhase = -1;
+    const endAt = start + DURACION_MS;
+    function draw(now) {
+      const elapsed = Math.min(DURACION_MS, Math.max(0, now - start));
+      const exact = elapsed / DURACION_MS * 100;
+      const percent = Math.min(100, Math.floor(exact));
+      $("progressFill").style.width = exact + "%";
+      $("percentage").textContent = String(percent).padStart(2,"0");
+      $("progressBar").setAttribute("aria-valuenow", String(percent));
+      $("countdown").textContent = (Math.max(0,DURACION_MS-elapsed) / 1000).toFixed(1) + " S";
+      let phase = 0;
+      for (let i = 0; i < phases.length; i++) if (percent >= phases[i].at) phase = i;
+      if (phase !== currentPhase) {
+        currentPhase = phase;
+        $("stepText").textContent = phases[phase].text;
+        $("log").textContent = phases[phase].log;
+        if (phase === phases.length - 1) $("headerStatus").textContent = "ACCESO AUTORIZADO";
+      }
+      if (elapsed < DURACION_MS) requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+    // El temporizador garantiza la redirección incluso si se ralentiza la animación.
+    window.setTimeout(() => { window.location.replace(DESTINO); }, DURACION_MS);
+  </script>
+  <noscript><a href="jorel_asalto_regalo.html" style="position:fixed;bottom:12px;left:12px;color:#ff6679">Continuar al juego</a></noscript>
+</body>
+</html>
